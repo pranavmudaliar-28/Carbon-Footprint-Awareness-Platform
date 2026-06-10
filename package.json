@@ -5,7 +5,8 @@
   "description": "Verda — Carbon Footprint Awareness Platform. Understand, track, and reduce your carbon footprint.",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "preview": "npm run build && npm run start",
     "lint": "next lint",
