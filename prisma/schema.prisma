@@ -1,0 +1,148 @@
+// Verda — Prisma schema (spec §5).
+// Designed for referential integrity, RLS, and fast aggregation.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String            @id @default(uuid())
+  email        String            @unique
+  name         String?
+  country      String            @default("IN")
+  createdAt    DateTime          @default(now())
+  profile      Profile?
+  entries      ActivityEntry[]
+  userActions  UserAction[]
+  goals        Goal[]
+  achievements UserAchievement[]
+  offsetActions OffsetAction[]
+}
+
+model Profile {
+  id            String @id @default(uuid())
+  userId        String @unique
+  user          User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  householdSize Int    @default(1)
+  baselineKg    Float? // footprint at onboarding, for progress tracking
+  avatarColor   String @default("#1B7A4B")
+}
+
+model Category {
+  id      String           @id @default(uuid())
+  key     String           @unique // transport | energy | food | shopping | travel
+  label   String
+  icon    String
+  factors EmissionFactor[]
+  entries ActivityEntry[]
+}
+
+model EmissionFactor {
+  id          String   @id @default(uuid())
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  activityKey String // e.g. "petrol_car_km", "grid_electricity_kwh"
+  label       String // "Petrol car"
+  unit        String // "km", "kWh", "kg", "meal"
+  co2ePerUnit Float // kg CO2e per unit
+  region      String   @default("IN")
+  source      String // "DEFRA 2023", "India CEA 2023"
+
+  @@unique([activityKey, region])
+}
+
+model ActivityEntry {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  activityKey String // references EmissionFactor.activityKey
+  quantity    Float // units consumed
+  co2eKg      Float // computed & stored at write time (denormalized → fast aggregation)
+  occurredOn  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([userId, occurredOn])
+}
+
+model Recommendation {
+  id          String       @id @default(uuid())
+  categoryKey String
+  title       String
+  description String
+  avgSavingKg Float // expected monthly saving
+  effort      String // "low" | "medium" | "high"
+  userActions UserAction[]
+}
+
+model UserAction {
+  id               String         @id @default(uuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recommendationId String
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id])
+  status           String         @default("active") // active | completed | dismissed
+  adoptedAt        DateTime       @default(now())
+}
+
+model Goal {
+  id       String @id @default(uuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetKg Float // monthly target
+  month    String // "2026-06"
+
+  @@unique([userId, month])
+}
+
+model Achievement {
+  id          String            @id @default(uuid())
+  key         String            @unique
+  label       String
+  description String
+  icon        String
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  earnedAt      DateTime    @default(now())
+
+  @@unique([userId, achievementId])
+}
+
+// ── v2 (spec §16) ────────────────────────────────────────────────────────────
+
+// Cached live grid carbon intensity per region (Electricity Maps). Reference
+// data — written server-side, reused for ~30 min (spec §16.2).
+model GridSnapshot {
+  id            String   @id @default(uuid())
+  region        String
+  intensityGco2 Float // gCO2e per kWh
+  fetchedAt     DateTime @default(now())
+
+  @@index([region, fetchedAt])
+}
+
+// A user-recorded carbon offset (spec §16.3).
+model OffsetAction {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider  String
+  offsetKg  Float
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
