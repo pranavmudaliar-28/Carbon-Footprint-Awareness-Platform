@@ -30,7 +30,6 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  outputFileTracing: false,
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
