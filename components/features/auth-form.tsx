@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import { SetupNotice } from '@/components/features/setup-notice';
 
@@ -103,10 +104,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' }) {
 
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete={isSignup ? 'new-password' : 'current-password'}
           required
           minLength={8}
