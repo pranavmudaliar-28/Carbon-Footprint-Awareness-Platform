@@ -1,13 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import {
-  ArrowRight,
-  ArrowDownRight,
-  Sparkles,
-  ShieldCheck,
-  Database,
-  Cpu,
-} from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, Database, Cpu } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/server';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
@@ -20,7 +13,8 @@ import { Reveal } from '@/components/marketing/reveal';
 import { DailyTimeline } from '@/components/marketing/daily-timeline';
 import { HiddenSources } from '@/components/marketing/hidden-sources';
 import { SavingsCalculator } from '@/components/marketing/savings-calculator';
-import { CarbonScore } from '@/components/marketing/carbon-score';
+import { BreakdownSection } from '@/components/marketing/breakdown-section';
+import { ProgressSection } from '@/components/marketing/progress-section';
 
 const accentCta =
   'border-0 bg-gradient-to-r from-[hsl(var(--l-accent))] to-[hsl(var(--l-accent-2))] font-semibold text-[hsl(var(--l-on-accent))] hover:opacity-90';
@@ -64,7 +58,7 @@ export default async function Home() {
       </header>
 
       {/* Hero */}
-      <section className="relative">
+      <section id="main-content" tabIndex={-1} className="relative">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -left-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-[hsl(var(--l-accent)/0.18)] blur-3xl"
@@ -155,53 +149,7 @@ export default async function Home() {
       </section>
 
       {/* Where it really comes from */}
-      <section className="mx-auto w-full max-w-6xl px-6 py-16">
-        <Reveal className="grid items-center gap-10 rounded-3xl border border-[hsl(var(--l-fg)/0.1)] bg-[hsl(var(--l-fg)/0.03)] p-8 backdrop-blur-xl lg:grid-cols-[1fr_auto] lg:p-12">
-          <div>
-            <h2 className="font-heading text-3xl font-semibold tracking-tight text-[hsl(var(--l-fg))] sm:text-4xl">
-              Most people guess wrong about their biggest source
-            </h2>
-            <p className="mt-4 max-w-xl text-lg text-[hsl(var(--l-muted))]">
-              The numbers don’t. Verda rolls everything into one honest picture
-              — and shows you precisely which slice of your life weighs the
-              most.
-            </p>
-            <div className="mt-6 space-y-3">
-              {[
-                { label: 'Transport', pct: 46 },
-                { label: 'Home energy', pct: 28 },
-                { label: 'Food', pct: 18 },
-                { label: 'Everything else', pct: 8 },
-              ].map((b) => (
-                <div key={b.label}>
-                  <div className="flex justify-between text-sm text-[hsl(var(--l-fg))]">
-                    <span>{b.label}</span>
-                    <span className="tabular-nums text-[hsl(var(--l-muted))]">
-                      {b.pct}%
-                    </span>
-                  </div>
-                  <div className="mt-1 h-2 overflow-hidden rounded-full bg-[hsl(var(--l-fg)/0.05)]">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-[hsl(var(--l-accent))] to-[hsl(var(--l-accent-2))]"
-                      style={{ width: `${b.pct}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="grid justify-items-center gap-3">
-            <CarbonScore score={71} suffix="% lighter" />
-            <p className="text-center text-sm text-[hsl(var(--l-muted))]">
-              Your footprint vs the
-              <br />
-              <span className="text-[hsl(var(--l-accent-2))]">
-                India per-capita average
-              </span>
-            </p>
-          </div>
-        </Reveal>
-      </section>
+      <BreakdownSection />
 
       {/* The footprint you can't feel */}
       <section className="mx-auto w-full max-w-6xl px-6 py-16">
@@ -254,59 +202,7 @@ export default async function Home() {
       </section>
 
       {/* Watch the number fall */}
-      <section className="mx-auto w-full max-w-6xl px-6 py-16">
-        <Reveal className="grid items-center gap-10 rounded-3xl border border-[hsl(var(--l-fg)/0.1)] bg-[hsl(var(--l-fg)/0.03)] p-8 backdrop-blur-xl lg:grid-cols-2 lg:p-12">
-          <div>
-            <h2 className="font-heading text-3xl font-semibold tracking-tight text-[hsl(var(--l-fg))] sm:text-4xl">
-              Watch the number fall
-            </h2>
-            <p className="mt-4 text-lg text-[hsl(var(--l-muted))]">
-              Small swaps compound. Verda keeps score — week after week — so the
-              motivation doesn’t fade after day three.
-            </p>
-            {/* streak dots */}
-            <div className="mt-6 flex items-center gap-1.5">
-              {Array.from({ length: 14 }).map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-6 w-3 rounded-full ${
-                    i < 11
-                      ? 'bg-gradient-to-b from-[hsl(var(--l-accent))] to-[hsl(var(--l-accent-2))]'
-                      : 'bg-[hsl(var(--l-fg)/0.1)]'
-                  }`}
-                />
-              ))}
-              <span className="ml-3 text-sm font-medium text-[hsl(var(--l-accent-2))]">
-                11-day streak
-              </span>
-            </div>
-          </div>
-
-          {/* before vs after */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-2xl border border-[hsl(var(--l-fg)/0.1)] bg-[hsl(var(--l-fg)/0.03)] p-5">
-              <p className="text-xs uppercase tracking-wide text-[hsl(var(--l-muted))]">
-                Before
-              </p>
-              <p className="mt-1 font-heading text-3xl font-bold text-[hsl(var(--l-fg))]">
-                412 kg
-              </p>
-              <p className="text-xs text-[hsl(var(--l-muted))]">last month</p>
-            </div>
-            <div className="rounded-2xl border border-[hsl(var(--l-accent)/0.4)] bg-[hsl(var(--l-accent)/0.08)] p-5">
-              <p className="text-xs uppercase tracking-wide text-[hsl(var(--l-accent-2))]">
-                On track for
-              </p>
-              <p className="mt-1 bg-gradient-to-r from-[hsl(var(--l-accent))] to-[hsl(var(--l-accent-2))] bg-clip-text font-heading text-3xl font-bold text-transparent">
-                327 kg
-              </p>
-              <p className="flex items-center gap-1 text-xs text-[hsl(var(--l-accent-2))]">
-                <ArrowDownRight className="h-3 w-3" /> 85 kg lighter
-              </p>
-            </div>
-          </div>
-        </Reveal>
-      </section>
+      <ProgressSection />
 
       {/* Final CTA */}
       <section className="px-6 py-16">

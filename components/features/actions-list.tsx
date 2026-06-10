@@ -5,6 +5,7 @@ import { Check, Leaf, RotateCcw, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { jsonFetch } from '@/lib/fetcher';
+import { EFFORT_VARIANT } from '@/lib/constants/categories';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,7 +31,6 @@ interface ActionsResponse {
   userActions: UserAction[];
 }
 
-const effortVariant = { low: 'low', medium: 'medium', high: 'high' } as const;
 const SUGGESTED_LIMIT = 5;
 
 function RecCard({
@@ -48,7 +48,7 @@ function RecCard({
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-medium text-foreground">{rec.title}</h3>
-            <Badge variant={effortVariant[rec.effort]} className="capitalize">
+            <Badge variant={EFFORT_VARIANT[rec.effort]} className="capitalize">
               {rec.effort} effort
             </Badge>
             <Badge variant="secondary" className="gap-1">

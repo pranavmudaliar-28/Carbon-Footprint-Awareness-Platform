@@ -39,6 +39,13 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background text-foreground">
+        {/* Keyboard skip link — first focusable element (a11y). */}
+        <a
+          href="#main-content"
+          className="sr-only-focusable focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-button focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-primary-foreground focus:shadow-soft"
+        >
+          Skip to main content
+        </a>
         <Providers>
           {children}
           <Toaster position="top-center" />

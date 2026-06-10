@@ -38,3 +38,10 @@ export const KM_PER_KG_CO2E = 1 / 0.17;
 export function kgToKmEquivalent(kg: number): number {
   return Math.round(kg * KM_PER_KG_CO2E);
 }
+
+/** Maps a recommendation/insight effort to its Badge variant (single source). */
+export const EFFORT_VARIANT = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;

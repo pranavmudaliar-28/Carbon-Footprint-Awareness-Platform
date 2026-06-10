@@ -3,24 +3,16 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  Info,
-  GraduationCap,
-  Plus,
-  Car,
-  Zap,
-  Utensils,
-  ShoppingBag,
-  Plane,
-  type LucideIcon,
-} from 'lucide-react';
+import { Info, GraduationCap, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { cn } from '@/lib/utils';
 import { jsonFetch } from '@/lib/fetcher';
 import { calculateCo2e } from '@/lib/services/carbon';
+import { emissionIntensity } from '@/lib/services/intensity';
 import { lessonForActivity } from '@/lib/services/education';
 import { kgToKmEquivalent } from '@/lib/constants/categories';
+import { categoryIcon } from '@/lib/constants/category-icons';
 import type { Lesson } from '@/lib/constants/lessons';
 import { createEntrySchema } from '@/lib/validators/schemas';
 import { Button } from '@/components/ui/button';
@@ -41,21 +33,6 @@ export interface FactorOption {
   categoryKey: string;
   categoryLabel: string;
   source: string;
-}
-
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  transport: Car,
-  energy: Zap,
-  food: Utensils,
-  shopping: ShoppingBag,
-  travel: Plane,
-};
-
-/** Per-entry emission intensity → Badge variant + label (preview accent only). */
-function intensity(kg: number): { variant: 'low' | 'medium' | 'high'; label: string } {
-  if (kg < 2) return { variant: 'low', label: 'Low impact' };
-  if (kg <= 10) return { variant: 'medium', label: 'Medium impact' };
-  return { variant: 'high', label: 'High impact' };
 }
 
 export function LogForm({ factors }: { factors: FactorOption[] }) {
@@ -139,7 +116,7 @@ export function LogForm({ factors }: { factors: FactorOption[] }) {
     );
   }
 
-  const previewIntensity = preview !== null ? intensity(preview) : null;
+  const previewIntensity = preview !== null ? emissionIntensity(preview) : null;
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
@@ -148,7 +125,7 @@ export function LogForm({ factors }: { factors: FactorOption[] }) {
         <legend className="text-sm font-medium text-foreground">Category</legend>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
           {categories.map((c) => {
-            const Icon = CATEGORY_ICONS[c.key] ?? Car;
+            const Icon = categoryIcon(c.key);
             const active = c.key === categoryKey;
             return (
               <button
@@ -235,7 +212,7 @@ export function LogForm({ factors }: { factors: FactorOption[] }) {
           </div>
           <div className="flex flex-col items-end gap-2">
             {previewIntensity && (
-              <Badge variant={previewIntensity.variant}>
+              <Badge variant={previewIntensity.badge}>
                 {previewIntensity.label}
               </Badge>
             )}

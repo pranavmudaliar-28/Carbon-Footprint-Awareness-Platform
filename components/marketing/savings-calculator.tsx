@@ -37,6 +37,7 @@ export function SavingsCalculator() {
           step={1}
           value={commutes}
           onChange={(e) => setCommutes(Number(e.target.value))}
+          aria-label="Car commutes swapped per week"
           aria-valuetext={`${commutes} commutes per week`}
           className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[hsl(var(--l-fg)/0.1)]"
           style={{ accentColor: 'hsl(var(--l-accent))' }}

@@ -5,16 +5,11 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { jsonFetch } from '@/lib/fetcher';
+import { monthKey } from '@/lib/services/aggregate';
 import { upsertGoalSchema } from '@/lib/validators/schemas';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-function currentMonth(): string {
-  // YYYY-MM in local time.
-  const d = new Date();
-  return `${d.getFullYear()}-${`${d.getMonth() + 1}`.padStart(2, '0')}`;
-}
 
 export function GoalForm({ currentTargetKg }: { currentTargetKg: number | null }) {
   const router = useRouter();
@@ -30,7 +25,7 @@ export function GoalForm({ currentTargetKg }: { currentTargetKg: number | null }
 
     const parsed = upsertGoalSchema.safeParse({
       targetKg: Number(targetKg),
-      month: currentMonth(),
+      month: monthKey(new Date()),
     });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? 'Enter a valid target.');

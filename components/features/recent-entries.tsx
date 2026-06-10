@@ -2,26 +2,12 @@
 
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Car,
-  Zap,
-  Utensils,
-  ShoppingBag,
-  Plane,
-  type LucideIcon,
-} from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { jsonFetch } from '@/lib/fetcher';
+import { emissionIntensity } from '@/lib/services/intensity';
+import { categoryIcon } from '@/lib/constants/category-icons';
 import type { FactorOption } from '@/components/features/log-form';
-
-const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  transport: Car,
-  energy: Zap,
-  food: Utensils,
-  shopping: ShoppingBag,
-  travel: Plane,
-};
 
 interface EntryRow {
   id: string;
@@ -30,12 +16,6 @@ interface EntryRow {
   co2eKg: number;
   occurredOn: string;
   category: { key: string; label: string };
-}
-
-function intensityTone(kg: number): string {
-  if (kg < 2) return 'text-forest-700';
-  if (kg <= 10) return 'text-amber-400';
-  return 'text-ember-500';
 }
 
 function formatDate(iso: string): string {
@@ -81,7 +61,7 @@ export function RecentEntries({ factors }: { factors: FactorOption[] }) {
     <ul className="space-y-2">
       {entries.slice(0, 12).map((e) => {
         const factor = byKey.get(e.activityKey);
-        const Icon = CATEGORY_ICONS[e.category.key] ?? Car;
+        const Icon = categoryIcon(e.category.key);
         return (
           <li
             key={e.id}
@@ -101,7 +81,7 @@ export function RecentEntries({ factors }: { factors: FactorOption[] }) {
             <span
               className={cn(
                 'shrink-0 text-sm font-semibold tabular-nums',
-                intensityTone(e.co2eKg)
+                emissionIntensity(e.co2eKg).toneClass
               )}
             >
               {e.co2eKg} kg

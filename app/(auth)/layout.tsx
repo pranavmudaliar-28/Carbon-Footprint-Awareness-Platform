@@ -12,9 +12,13 @@ export default function AuthLayout({
       <Link href="/" className="mb-8 rounded-button">
         <Logo />
       </Link>
-      <div className="w-full max-w-sm rounded-card border border-border bg-card p-8 shadow-soft">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="w-full max-w-sm rounded-card border border-border bg-card p-8 shadow-soft"
+      >
         {children}
-      </div>
+      </main>
     </div>
   );
 }

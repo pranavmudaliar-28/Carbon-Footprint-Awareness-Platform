@@ -112,9 +112,9 @@
   --l-bg: 150 33% 98%;
   --l-bg-2: 150 26% 94%;
   --l-fg: 158 32% 11%;
-  --l-muted: 155 10% 38%;
-  --l-accent: 152 56% 34%;
-  --l-accent-2: 172 58% 32%;
+  --l-muted: 155 14% 30%; /* AA (≥4.5:1) on the light landing bg */
+  --l-accent: 152 60% 30%;
+  --l-accent-2: 174 70% 25%; /* used as text → AA on light */
   --l-border: 150 16% 86%;
   --l-on-accent: 0 0% 100%;
 

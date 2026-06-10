@@ -10,6 +10,7 @@ import {
   filterByMonth,
   monthKey,
   monthOverMonthDelta,
+  round1,
   totalKg,
   trendSeries,
   type MonthDelta,
@@ -100,8 +101,4 @@ export async function buildFootprintSummary(
     offsetTotalKg: round1(offsetTotalKg),
     streakDays: currentStreak(entries, now),
   };
-}
-
-function round1(n: number): number {
-  return Math.round(n * 10) / 10;
 }

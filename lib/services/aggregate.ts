@@ -185,6 +185,7 @@ export function monthOverMonthDelta(
   return { currentKg, previousKg, deltaKg, deltaPct };
 }
 
-function round1(n: number): number {
+/** Round to one decimal place (kg). Shared by the aggregation + footprint services. */
+export function round1(n: number): number {
   return Math.round(n * 10) / 10;
 }
